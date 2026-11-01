@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./App.css";
 
 const objects = [
-    { id: "gramaphone", name: "Gramophone", x: 30, y: 55},
+    { id: "gramophone", name: "Gramophone", x: 30, y: 55},
     { id: "notebook", name: "Case Files", x:55, y:65},
     { id: "clock", name: "Pocket Watch", x: 75, y: 45 },
     { id: "bookshelf", name: "Bookshelf", x: 10, y:25 },
@@ -20,7 +20,7 @@ function App() {
                         className="object"
                         style={{
                             left: `${obj.x}%`,
-                            right: `${obj.y}%`,
+                            top: `${obj.y}%`,
                         }}
                         onClick={() => setActive(obj)}
                     >
