@@ -26,6 +26,8 @@ function App() {
     const [active, setActive] = useState(null);
     const [currentSong, setCurrentSong] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [tasks, setTasks] = useState([]);
+    const [newTask, setNewTask] = useState("");
     const audioRef = useRef(null);
 
     function toggleMusic() {
@@ -43,6 +45,32 @@ function App() {
       }
     }
 
+    function addTask() {
+      if (!newTask.trim()) return;
+
+      const task = {
+        id: Date.now(),
+        text: newTask.trim(),
+        completed: false,
+      };
+
+      setTasks([...tasks, task]);
+      setNewTask("");
+    }
+
+    function toggleTask(id) {
+      setTasks(
+        tasks.map((task) =>
+          task.id === id
+            ? {...task, completed: !task.completed}
+            : task
+        )
+      );
+    }
+
+    function deleteTask(id) {
+      setTasks(tasks.filter((task) => task.id !== id ))
+    }
     
     return (
       <div className="app">
@@ -137,6 +165,53 @@ function App() {
                     {isPlaying ? "Pause" : "Play"}
                   </button>
                 </div>
+              ) : active.id === "case-files" ? (
+                <div className="case-files">
+                  <h3>Open Cases</h3>
+
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="New assignment..."
+                      value={newTask}
+                      onChange={(e) => setNewTask(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") addTask();
+                      }}
+                    />
+                    <button onClick={addTask}>Add Case</button>
+                  </div>
+
+                  {tasks.length === 0 ? (
+                    <p>No open cases... for now.</p>
+                  ) : (
+                    <ul>
+                      {tasks.map((task) => (
+                        <li key={task.id}>
+                          <input
+                            type="checkbox"
+                            checked={task.completed}
+                            onChange={() => toggleTask(task.id)}
+                          />
+
+                          <span
+                            style={{
+                              textDecoration: task.completed
+                                ? "line-through"
+                                : "none",
+                            }}
+                          >
+                            {task.text}
+                          </span>
+
+                          <button onClick={() => deleteTask(task.id)}>
+                            x
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+            </div>
               ) : (
                 <p>Coming soon!</p>
               )}
