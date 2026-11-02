@@ -48,6 +48,10 @@ function App() {
         };
       }
     });
+    const [dailyGoal, setDailyGoal] = useState(() => {
+      const saved = localStorage.getItem("case-1159-daily-goal");
+      return saved ? Number(saved) : 50;
+    });
     const [cakeSlices, setCakeSlices] = useState(() => {
       const saved = localStorage.getItem("case-1159-cake");
       return saved ? Number(saved) : 0;
@@ -98,6 +102,10 @@ function App() {
         JSON.stringify(studyStats)
       );
     }, [studyStats]);
+
+    useEffect(() => {
+      localStorage.setItem("case-1159-daily-goal", dailyGoal);
+    }, [dailyGoal]);
 
     function toggleMusic() {
       const audio = audioRef.current;
@@ -218,6 +226,26 @@ function App() {
     }
 
     const weeklyActivity = getWeeklyActivity();
+    const today = new Date().toLocaleDateString();
+
+    const todayMinutes = studyStats.history
+      .filter((session) =>
+        new Date(session.date).toLocaleDateString() === today
+      )
+      .reduce((total, session) => total + session.duration, 0);
+
+    const currentSessionMinutes =
+      timerMode === "focus" && timeLeft < 25 * 60
+        ? (25 * 60 - timeLeft) / 60
+        : 0;
+
+    const liveTodayMinutes = todayMinutes + currentSessionMinutes;
+
+    
+      const goalProgress = Math.min(
+      (liveTodayMinutes / dailyGoal) * 100,
+      100
+    );
     const maxMinutes = Math.max(
       25,
       ...weeklyActivity.map((day) => day.minutes)
@@ -397,6 +425,37 @@ function App() {
                   <div className="study-stats">
                     <h3>Investigation Log</h3>
 
+                    <div className="daily-goal">
+                      <label htmlFor="daily-goal-select">
+                        Daily Focus Target:
+                      </label>
+
+                      <select
+                        id="daily-goal-select"
+                        value={dailyGoal}
+                        onChange={(e) => setDailyGoal(Number(e.target.value))}
+                      >
+                        <option value={25}>25 minutes</option>
+                        <option value={50}>50 minutes</option>
+                        <option value={75}>75 minutes</option>
+                        <option value={100}>100 minutes</option>
+                        <option value={150}>150 minutes</option>
+                      </select>
+
+                      <p>{liveTodayMinutes.toFixed(1)} / {dailyGoal} minutes</p>
+
+                      <div className="goal-progress-track">
+                        <div
+                          className="goal-progress-fill"
+                          style={{ width: `${goalProgress}%` }}
+                        />
+                      </div>
+
+                      {todayMinutes >= dailyGoal && (
+                        <p>Case Closed!! Today's goal completed!</p>
+                      )}
+                    </div>
+                    
                     <p>Focus Sessions Completed: {studyStats.focusSessions}</p>
                     <p>Total Study Time: {studyStats.totalMinutes} minutes</p>
 

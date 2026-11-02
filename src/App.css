@@ -141,3 +141,23 @@ body {
   font-size: 12px;
   margin: 6px 0;
 }
+
+.daily-goal select {
+  margin-left: 10px;
+  padding: 5px;
+  font-family: Georgia, serif;
+}
+
+.goal-progress-track {
+  height: 18px;
+  width: 100%;
+  background: #d4c3a1;
+  border: 1px solid #8b7355;
+  overflow: hidden;
+}
+
+.goal-progress-fill {
+  height: 100%;
+  background: #795548;
+  transition: width 0.4s ease;
+}
