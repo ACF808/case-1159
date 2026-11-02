@@ -120,3 +120,24 @@ body {
   margin: 16px 0;
   color: #8b4a58;
 }
+
+.activity-chart {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.activity-day {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+
+.activity-minutes,
+.activity-label {
+  display: block;
+  font-size: 12px;
+  margin: 6px 0;
+}

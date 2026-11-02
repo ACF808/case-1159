@@ -29,6 +29,25 @@ function App() {
     const [timerMode, setTimerMode] = useState("focus");
     const [timeLeft, setTimeLeft] = useState(25*60);
     const [timerRunning, setTimerRunning] = useState(false);
+    const [studyStats, setStudyStats] = useState(() => {
+      try {
+        const saved = localStorage.getItem("case-1159-stats");
+
+        return saved
+          ? JSON.parse(saved)
+          : {
+            focusSessions: 0,
+            totalMinutes: 0,
+            history: [],
+          };
+      } catch {
+        return {
+          focusSessions: 0,
+          totalMinutes: 0,
+          history: [],
+        };
+      }
+    });
     const [cakeSlices, setCakeSlices] = useState(() => {
       const saved = localStorage.getItem("case-1159-cake");
       return saved ? Number(saved) : 0;
@@ -64,13 +83,21 @@ function App() {
 
         if (timerMode === "focus") {
           setCakeSlices((prev) => prev + 1);
+          recordFocusSession();
         }
       }
-    }, [timeLeft, timerRunning]);
+    }, [timeLeft, timerRunning, timerMode]);
 
     useEffect(() => {
       localStorage.setItem("case-1159-cake", cakeSlices);
     }, [cakeSlices]);
+
+    useEffect(() => {
+      localStorage.setItem(
+        "case-1159-stats",
+        JSON.stringify(studyStats)
+      );
+    }, [studyStats]);
 
     function toggleMusic() {
       const audio = audioRef.current;
@@ -126,6 +153,20 @@ function App() {
       setTasks(tasks.filter((task) => task.id !== id ))
     }
 
+    function recordFocusSession() {
+      const session = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        duration: 25,
+      };
+
+      setStudyStats((prev) => ({
+        focusSessions: prev.focusSessions + 1,
+        totalMinutes: prev.totalMinutes + 25,
+        history: [...prev.history, session],
+      }));
+    }
+
     function switchTimerMode(mode) {
       setTimerRunning(false);
       setTimerMode(mode);
@@ -143,6 +184,44 @@ function App() {
 
       return `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
     }
+
+    function getWeeklyActivity() {
+      const days = [];
+
+      for (let i=6; i >= 0; i--) {
+        const date = new Date();
+        date.setHours(0,0,0,0);
+        date.setDate(date.getDate() - i);
+
+        const nextDate = new Date(date);
+        nextDate.setDate(nextDate.getDate() + 1);
+
+        const sessions = studyStats.history.filter((session) => {
+          const sessionDate = new Date(session.date);
+          return sessionDate >= date && sessionDate < nextDate;
+        });
+
+        days.push({
+          label: date.toLocaleDateString("en-US", {
+            weekday: "short",
+          }),
+          date: date.toLocaleDateString(),
+          sessions: sessions.length,
+          minutes: sessions.reduce(
+            (total, session) => total + session.duration,
+            0
+          ),
+        });
+      }
+
+      return days;
+    }
+
+    const weeklyActivity = getWeeklyActivity();
+    const maxMinutes = Math.max(
+      25,
+      ...weeklyActivity.map((day) => day.minutes)
+    );
     
     return (
       <div className="app">
@@ -313,6 +392,45 @@ function App() {
                     <button onClick={resetTimer}>
                       Reset
                     </button>
+                  </div>
+
+                  <div className="study-stats">
+                    <h3>Investigation Log</h3>
+
+                    <p>Focus Sessions Completed: {studyStats.focusSessions}</p>
+                    <p>Total Study Time: {studyStats.totalMinutes} minutes</p>
+
+                    <p>
+                      Last Session: {
+                        studyStats.history.length > 0
+                          ? new Date(
+                              studyStats.history[studyStats.history.length - 1].date
+                            ).toLocaleString()
+                          : "no sessions recorded yet"
+                      }
+                    </p>
+
+                    <div className="activity-chart">
+                      {weeklyActivity.map((day) => (
+                        <div className="activity-day" key={day.date}>
+                          <span className="activity-minutes">
+                            {day.minutes}m
+                          </span>
+
+                          <div className="activity-bar-track">
+                            <div
+                              className="activity-bar"
+                              style={{
+                                height: `${(day.minutes / maxMinutes) * 100}%`,
+                              }}
+                              title={`${day.sessions} sessions`}
+                            />
+                          </div>
+
+                          <span className="activity-label">{day.label}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               ) : active.id === "cake" ? (
