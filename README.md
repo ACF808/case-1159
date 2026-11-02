@@ -1,16 +1,44 @@
-# React + Vite
+# The Curious Case of the 11:59 Deadline
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A little Victorian-inspired study parlour for anyone who's ever left an assignment until the very last minute!
 
-Currently, two official plugins are available:
+**[Try it live!](https://case-1159.vercel.app/)**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Explore a hand-illustrated room filled with interactive objects designed to make studying a little more enjoyable.
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Gramophone:** Listen to three different records while studying.
+- **Case Files:** Add, complete, and organise assignments.
+- **Pocket Watch:** Use a Pomodoro timer to stay focused.
+- **Investigation Log:** Track completed focus sessions, study time, and weekly activity.
+- **Daily Goals:** Set custom study targets and watch your progress bar fill up in real time.
+- **Sweet Rewards:** Earn cake slices by completing assignments and focus sessions.
 
-## Expanding the Oxlint configuration
+Your tasks, rewards, and study progress are saved locally, so they'll still be there when you return!
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Built With
+
+- React + Vite
+- JavaScript
+- CSS
+- Clip Studio Paint (for the illustrations)
+
+## Running Locally
+
+```bash
+git clone https://github.com/ACF808/case-1159.git
+cd case-1159
+npm install
+npm run dev
+```
+
+Then open the local URL shown in your terminal.
+
+## Credits
+
+All room illustrations were drawn by me!
+
+Music by alex morgan and andriih from pixabay.
+
+Made for **Hack Club Terra**.
