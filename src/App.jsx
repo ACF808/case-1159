@@ -29,6 +29,10 @@ function App() {
     const [timerMode, setTimerMode] = useState("focus");
     const [timeLeft, setTimeLeft] = useState(25*60);
     const [timerRunning, setTimerRunning] = useState(false);
+    const [cakeSlices, setCakeSlices] = useState(() => {
+      const saved = localStorage.getItem("case-1159-cake");
+      return saved ? Number(saved) : 0;
+    });
     const [tasks, setTasks] = useState(() =>{
       try {
         const savedTasks = localStorage.getItem("case-1159-tasks");
@@ -57,8 +61,16 @@ function App() {
     useEffect (() => {
       if (timeLeft === 0 && timerRunning) {
         setTimerRunning(false);
+
+        if (timerMode === "focus") {
+          setCakeSlices((prev) => prev + 1);
+        }
       }
     }, [timeLeft, timerRunning]);
+
+    useEffect(() => {
+      localStorage.setItem("case-1159-cake", cakeSlices);
+    }, [cakeSlices]);
 
     function toggleMusic() {
       const audio = audioRef.current;
@@ -89,11 +101,23 @@ function App() {
     }
 
     function toggleTask(id) {
+      const task = tasks.find((task) => task.id === id);
+      if (!task) return;
+
+      if (!task.completed && !task.rewarded) {
+        setCakeSlices((prev) => prev + 1);
+      }
+
       setTasks(
         tasks.map((task) =>
-          task.id === id
-            ? {...task, completed: !task.completed}
-            : task
+        task.id === id
+          ? {
+              ...task,
+              completed: !task.completed,
+              rewarded: task.rewarded || !task.completed
+            }
+          : task
+        
         )
       );
     }
@@ -291,6 +315,16 @@ function App() {
                     </button>
                   </div>
                 </div>
+              ) : active.id === "cake" ? (
+                <div className="cake-rewards">
+                  <h3>Sweet Rewards</h3>
+                  <p> every accomplishment deserves a treat!!!</p>
+
+                  <h1>{cakeSlices}</h1>
+                  <p>Cake Slices Earned</p>
+                  <p>Complete an assignment: +1 slice</p>
+                  <p>Finish a focus session: +1 slice</p>
+                </div>
               ) : (
                 <p>Coming Soon!</p>
               )}
@@ -302,3 +336,4 @@ function App() {
   }
 
   export default App;
+

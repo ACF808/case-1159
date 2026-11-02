@@ -109,3 +109,14 @@ body {
   margin: 25px 0;
   font-variant-numeric: tabular-nums;
 }
+
+.cake-rewards {
+  text-align: center;
+}
+
+.cake-rewards h1 {
+  font-family: Georgia, serif;
+  font-size: 64px;
+  margin: 16px 0;
+  color: #8b4a58;
+}
