@@ -1,5 +1,5 @@
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import "./App.css";
 
 const layers = [
@@ -26,9 +26,39 @@ function App() {
     const [active, setActive] = useState(null);
     const [currentSong, setCurrentSong] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [tasks, setTasks] = useState([]);
+    const [timerMode, setTimerMode] = useState("focus");
+    const [timeLeft, setTimeLeft] = useState(25*60);
+    const [timerRunning, setTimerRunning] = useState(false);
+    const [tasks, setTasks] = useState(() =>{
+      try {
+        const savedTasks = localStorage.getItem("case-1159-tasks");
+        return savedTasks ? JSON.parse(savedTasks) : [];
+      } catch {
+        return [];
+      }
+    });
     const [newTask, setNewTask] = useState("");
     const audioRef = useRef(null);
+
+    useEffect(() => {
+      localStorage.setItem("case-1159-tasks", JSON.stringify(tasks));
+    }, [tasks]);
+
+    useEffect(() => {
+      if (!timerRunning) return;
+
+      const interval = setInterval(() => {
+        setTimeLeft((prev) => Math.max(prev - 1, 0));
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }, [timerRunning]);
+
+    useEffect (() => {
+      if (timeLeft === 0 && timerRunning) {
+        setTimerRunning(false);
+      }
+    }, [timeLeft, timerRunning]);
 
     function toggleMusic() {
       const audio = audioRef.current;
@@ -70,6 +100,24 @@ function App() {
 
     function deleteTask(id) {
       setTasks(tasks.filter((task) => task.id !== id ))
+    }
+
+    function switchTimerMode(mode) {
+      setTimerRunning(false);
+      setTimerMode(mode);
+      setTimeLeft(mode === "focus" ? 25 * 60 : 5 * 60);
+    }
+
+    function resetTimer() {
+      setTimerRunning(false);
+      setTimeLeft(timerMode === "focus" ? 25 * 60 : 5 * 60);
+    }
+
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+
+      return `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
     }
     
     return (
@@ -212,8 +260,39 @@ function App() {
                     </ul>
                   )}
             </div>
+              ) : active.id === "pocket-watch" ? (
+                <div className="pocket-watch">
+                  <h3>Time is Ticking...</h3>
+
+                  <div className="timer-modes">
+                    <button onClick={() => switchTimerMode("focus")}>
+                      Focus
+                    </button>
+
+                    <button onClick={() => switchTimerMode("break")}>
+                      Short Break
+                    </button>
+                  </div>
+
+                  <h1 className="timer-display">
+                    {formatTime(timeLeft)}
+                  </h1>
+
+                  <div className="timer-controls">
+                    <button
+                      onClick={() => setTimerRunning(!timerRunning)}
+                      disabled={timeLeft === 0}
+                    >
+                      {timerRunning ? "Pause" : "Start"}
+                    </button>
+
+                    <button onClick={resetTimer}>
+                      Reset
+                    </button>
+                  </div>
+                </div>
               ) : (
-                <p>Coming soon!</p>
+                <p>Coming Soon!</p>
               )}
             </div>
           </div>

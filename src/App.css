@@ -90,3 +90,22 @@ body {
 .room-layer.gramophone-needle {
   z-index: 2;
 }
+
+.pocket-watch {
+  text-align: center;
+}
+
+.timer-modes,
+.timer-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.timer-display {
+  font-family: Georgia, serif;
+  font-size: 64px;
+  margin: 25px 0;
+  font-variant-numeric: tabular-nums;
+}
